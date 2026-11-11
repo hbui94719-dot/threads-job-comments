@@ -1,10 +1,10 @@
-# Tình trạng cài đặt
+# Tình trạng phiên bản
 
-- Đã cài code vào repo `hbui94719-dot/threads-job-comments`.
-- Chủ tài khoản đã đồng ý công khai ảnh QR nhóm Zalo. Ảnh nguyên bản nằm tại `assets/comment.jpg`.
-- `image_url` trỏ tới ảnh ở commit cố định trên GitHub; không cần đăng nhập để tải.
-- Nội dung bình luận giữ nguyên như bạn đã gửi trong `comments.json`.
-- Lịch gửi bình luận vẫn tắt (`enabled: false`).
-- Chưa đăng bất kỳ bình luận nào; chưa có screenshot xác nhận đăng thật.
-- Cần app Meta được duyệt quyền tìm kiếm công khai và user access token trước khi chạy qua API.
-- Nếu không chụp được bình luận đã gửi, tool giữ lịch sử và chặn gửi tiếp, không đăng lại.
+- Bản Chrome mới ở `chrome-extension/`: chạy bằng phiên Threads bạn tự đăng nhập, không cần app Meta.
+- Ảnh QR đã được bạn đồng ý công khai, có trong tiện ích và repo.
+- Sau khi bấm Bắt đầu, tiện ích tự tìm bài, gắn ảnh và bấm gửi; screenshot lưu trên máy bạn.
+- Đã thử luồng trang trên trang giả lập trong Chromium và các trường hợp giữ trạng thái/dừng bằng API Chrome giả lập.
+- Môi trường này chặn nạp extension đã giải nén bằng chính sách quản trị; chưa xác nhận cài/service worker Chrome thật. Chưa thử đăng trên Threads thật.
+- Cần cài trên máy và chạy thử số lượng 1 để xác nhận giao diện/tài khoản/screenshot trước khi chạy lâu. Không bảo đảm chạy qua đêm chưa thử.
+- Không có bình luận nào đã được gửi từ phiên chuẩn bị này.
+- Bản API cũ vẫn có `enabled: false` và chưa bật lịch trên GitHub.

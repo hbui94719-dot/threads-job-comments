@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Threads – Tìm việc online",
+  "version": "1.0.0",
+  "description": "Tìm bài việc online, gửi nội dung và ảnh QR, lưu screenshot; dừng nếu không xác minh được kết quả.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "downloads",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://www.threads.com/*",
+    "https://threads.com/*",
+    "https://www.threads.net/*",
+    "https://threads.net/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Threads – Tìm việc online"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

@@ -1,3 +1,13 @@
+# Dùng bản Chrome, không cần tạo app Meta
+
+Bản mới nằm trong [chrome-extension](chrome-extension/README.md). Tải repo bằng **Code → Download ZIP**, giải nén, mở `chrome://extensions` → bật Developer mode → Load unpacked → chọn thư mục `chrome-extension`.
+
+**Bản Chrome sẽ tự bấm gửi sau khi bạn bấm Bắt đầu.** Đăng nhập Threads trong Chrome, nhập đúng tên tài khoản và chạy thử số lượng 1 trước. Máy phải mở và không ngủ. Chưa thử trên tài khoản Threads thật, không bảo đảm giao diện hiện tại sẽ khớp; tool dừng khi không xác nhận được kết quả. Screenshot lưu trên máy bạn.
+
+Phần dưới là tài liệu của **bản API cũ**, đang tắt. Bạn không cần thiết lập app Meta để cài bản Chrome.
+
+---
+
 > **Tình trạng cài đặt:** lịch gửi đang tắt. Cần thiết lập Threads API và secret `THREADS_ACCESS_TOKEN`. Ảnh QR đã được chủ tài khoản đồng ý công khai; ảnh có tại `assets/comment.jpg` và `image_url` đã được cấu hình bằng đường dẫn cố định. Xem `RUN_STATUS.md`.
 
 # Bình luận Threads theo từ khóa — chạy bằng GitHub Actions

@@ -1,0 +1,10 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Threads · Tìm việc online</title><link rel="stylesheet" href="popup.css"></head>
+<body><header><span class="tag">CHẠY TRÊN MÁY CỦA BẠN</span><h1>Threads · Tìm việc online</h1><p>Nội dung và ảnh QR đã chuẩn bị. Không cần app Meta.</p></header>
+<main><label for="username">Tên tài khoản Threads của bạn (bỏ dấu @)</label><input id="username" placeholder="ten_threads_cua_ban" autocomplete="off" maxlength="30">
+<label for="text">Nội dung sẽ gửi</label><textarea id="text" rows="5"></textarea>
+<div class="row"><label for="goal">Số lượng tối đa</label><input id="goal" type="number" min="1" max="500" value="1"></div>
+<details><summary>Ảnh QR sẽ đính kèm</summary><img src="assets/comment.jpg" alt="Ảnh QR nhóm Zalo bạn đã chọn"></details>
+<p class="note">Lần đầu để <b>1</b> để kiểm tra tài khoản và giao diện. Khi chạy, tiện ích tự bấm gửi. Giữ tab Threads được chọn và máy không ngủ. Mỗi phút xử lý tối đa một bài; không cam kết tìm đủ 500 bài.</p>
+<div class="buttons"><button id="start">Bắt đầu</button><button id="stop" class="secondary">Dừng</button></div>
+<p id="status" role="status" aria-live="polite"></p><p id="error" role="alert"></p><button id="export" class="link">Tải nhật ký</button><ol id="log"></ol>
+<footer>Screenshot lưu vào Downloads/threads-job-comments. Lỗi đăng nhập, gửi không rõ kết quả hoặc chụp ảnh lỗi sẽ làm tool dừng.</footer></main><script src="popup.js"></script></body></html>
