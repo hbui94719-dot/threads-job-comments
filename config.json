@@ -1,0 +1,12 @@
+{
+  "enabled": false,
+  "image_url": null,
+  "require_image": true,
+  "screenshots": true,
+  "keywords": ["tìm việc online", "công việc online", "job online"],
+  "max_per_24h": 500,
+  "max_per_run": 12,
+  "interval_seconds": 5,
+  "max_pages_per_keyword": 3,
+  "max_post_age_hours": 72
+}

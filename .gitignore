@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+state/
+report.json
+*.log
+*.zip
+.DS_Store

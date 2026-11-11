@@ -1,0 +1,167 @@
+name: Threads job comments
+
+on:
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'preview = chỉ xem; live = gửi bình luận khi config.enabled=true'
+        type: choice
+        options:
+          - preview
+          - live
+        default: preview
+        required: true
+      initialize_state:
+        description: 'Chỉ bật khi chạy live lần đầu: tạo nhánh bot-state nếu chưa tồn tại'
+        type: boolean
+        default: false
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: threads-comments-state
+  cancel-in-progress: false
+
+jobs:
+  comments:
+    if: github.event_name != 'schedule' || vars.THREADS_SCHEDULE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      THREADS_STATE_REPO: ${{ runner.temp }}/threads-bot-state
+      THREADS_STATE_FILE: ${{ github.workspace }}/state/state.json
+      THREADS_STATE_CHECKPOINT: ${{ github.workspace }}/.github/scripts/checkpoint-state.sh
+    steps:
+      - name: Read source from the default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Select execution mode
+        id: settings
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_MODE: ${{ inputs.mode }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          config = json.loads(Path("config.json").read_text(encoding="utf-8"))
+          enabled = config.get("enabled", False)
+          if type(enabled) is not bool:
+              raise SystemExit("config.enabled must be true or false")
+          screenshots = config.get("screenshots", False)
+          if type(screenshots) is not bool:
+              raise SystemExit("config.screenshots must be true or false")
+          scheduled = os.environ["EVENT_NAME"] == "schedule"
+          mode = "live" if scheduled else os.environ.get("INPUT_MODE", "preview")
+          if mode not in ("preview", "live"):
+              raise SystemExit("Unsupported execution mode")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"run={'true' if not scheduled or enabled else 'false'}\n")
+              output.write(f"mode={mode}\n")
+              output.write(f"screenshots={'true' if screenshots else 'false'}\n")
+          if scheduled and not enabled:
+              print("Schedule is paused: config.enabled=false")
+          PY
+
+      - name: Restore durable history, or explicitly initialize it
+        id: state
+        if: steps.settings.outputs.run == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INITIALIZE_STATE: ${{ inputs.initialize_state }}
+          EVENT_NAME: ${{ github.event_name }}
+          RUN_MODE: ${{ steps.settings.outputs.mode }}
+        run: |
+          set -euo pipefail
+          auth_header="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 | tr -d '\n')"
+          echo "::add-mask::$auth_header"
+          export GIT_CONFIG_COUNT=1
+          export GIT_CONFIG_KEY_0='http.https://github.com/.extraheader'
+          export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth_header"
+          remote_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git"
+          set +e
+          git ls-remote --exit-code --heads "$remote_url" refs/heads/bot-state > "$RUNNER_TEMP/threads-state-ref"
+          remote_status=$?
+          set -e
+          if test "$remote_status" -ne 0 && test "$remote_status" -ne 2; then
+            echo 'Unable to determine history branch status; refusing to send.' >&2
+            exit 1
+          fi
+          if test "$remote_status" -eq 2 && test "$INITIALIZE_STATE" != 'true'; then
+            if test "$RUN_MODE" = 'preview'; then
+              echo 'No history yet. Preview can run without creating it.'
+              echo 'ready=false' >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo 'No bot-state branch. For a genuinely new setup, run manually with initialize_state checked. Never reset existing history to fix a connection failure.' >&2
+            exit 1
+          fi
+          git init "$THREADS_STATE_REPO"
+          git -C "$THREADS_STATE_REPO" remote add origin "$remote_url"
+          mkdir -p state
+          if test "$remote_status" -eq 0; then
+            git -C "$THREADS_STATE_REPO" fetch --no-tags --depth=1 origin refs/heads/bot-state
+            git -C "$THREADS_STATE_REPO" checkout -b bot-state FETCH_HEAD
+            if test -L "$THREADS_STATE_REPO/state" || test -L "$THREADS_STATE_REPO/state/state.json"; then
+              echo 'Invalid history: symbolic links are not accepted.' >&2
+              exit 1
+            fi
+            cp "$THREADS_STATE_REPO/state/state.json" state/state.json
+          else
+            if test "$EVENT_NAME" != 'workflow_dispatch'; then
+              echo 'History initialization requires a manual run.' >&2
+              exit 1
+            fi
+            git -C "$THREADS_STATE_REPO" checkout --orphan bot-state
+            python3 bot.py --init-state --state state/state.json
+            bash .github/scripts/checkpoint-state.sh
+          fi
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+
+      - name: Run regression checks
+        if: steps.settings.outputs.run == 'true'
+        run: python3 -m unittest discover -v
+
+      - name: Install browser for proof screenshots
+        if: steps.settings.outputs.run == 'true' && steps.settings.outputs.screenshots == 'true' && steps.settings.outputs.mode == 'live'
+        run: |
+          python3 -m pip install --disable-pip-version-check playwright==1.56.0
+          python3 -m playwright install --with-deps chromium
+
+      - name: Search and process comments
+        if: steps.settings.outputs.run == 'true'
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_MODE: ${{ steps.settings.outputs.mode }}
+        run: python3 bot.py --mode "$RUN_MODE" --state state/state.json --report report.json
+
+      - name: Save final history even when processing failed
+        if: always() && steps.state.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .github/scripts/checkpoint-state.sh
+
+      - name: Upload search preview and run result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: threads-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            report.json
+            screenshots/
+          if-no-files-found: ignore
+          retention-days: 7
