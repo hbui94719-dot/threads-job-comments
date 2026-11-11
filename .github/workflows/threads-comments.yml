@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      THREADS_STATE_REPO: ${{ runner.temp }}/threads-bot-state
+      THREADS_STATE_REPO: ${{ github.workspace }}/.threads-bot-state
       THREADS_STATE_FILE: ${{ github.workspace }}/state/state.json
       THREADS_STATE_CHECKPOINT: ${{ github.workspace }}/.github/scripts/checkpoint-state.sh
     steps:
