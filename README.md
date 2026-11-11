@@ -1,4 +1,4 @@
-> **Tình trạng cài đặt:** lịch gửi đang tắt. Cần thiết lập Threads API và secret `THREADS_ACCESS_TOKEN`. Ảnh QR chỉ có trong ZIP của cuộc trò chuyện; chưa được tải lên repo công khai, `image_url` chưa được cấu hình. Xem `RUN_STATUS.md`.
+> **Tình trạng cài đặt:** lịch gửi đang tắt. Cần thiết lập Threads API và secret `THREADS_ACCESS_TOKEN`. Ảnh QR đã được chủ tài khoản đồng ý công khai; ảnh có tại `assets/comment.jpg` và `image_url` đã được cấu hình bằng đường dẫn cố định. Xem `RUN_STATUS.md`.
 
 # Bình luận Threads theo từ khóa — chạy bằng GitHub Actions
 

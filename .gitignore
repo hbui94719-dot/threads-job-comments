@@ -1,4 +1,5 @@
 __pycache__/
+.threads-bot-state/
 *.py[cod]
 .env
 .env.*

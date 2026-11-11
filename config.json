@@ -1,9 +1,13 @@
 {
   "enabled": false,
-  "image_url": null,
+  "image_url": "https://raw.githubusercontent.com/hbui94719-dot/threads-job-comments/0ccfd13dfff562dc51a95ffb6b4ea9251b108c22/assets/comment.jpg",
   "require_image": true,
   "screenshots": true,
-  "keywords": ["tìm việc online", "công việc online", "job online"],
+  "keywords": [
+    "tìm việc online",
+    "công việc online",
+    "job online"
+  ],
   "max_per_24h": 500,
   "max_per_run": 12,
   "interval_seconds": 5,
